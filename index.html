@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>我的今日预约</title>
+    <style>
+        /* CSS样式部分保持不变，和之前的代码一样 */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f8f8f8; color: #333; }
+        .page { display: none; height: 100%; box-sizing: border-box; }
+        .page.active { display: block; }
+        .header { display: flex; align-items: center; padding: 10px 15px; background-color: #ffffff; border-bottom: 1px solid #e5e5e5; position: relative; text-align: center; }
+        .header-title-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 24px; }
+        .header .title { font-size: 17px; font-weight: 600; color: #000; }
+        .header .back-arrow, .header .more-options { font-size: 24px; font-weight: bold; color: #000; text-decoration: none; position: absolute; }
+        .header .back-arrow { left: 15px; }
+        .header .more-options { right: 15px; }
+        .content { padding: 20px; }
+        .card { background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .card-title { font-size: 18px; font-weight: bold; }
+        .card-id { font-size: 14px; color: #999; }
+        .card-body { padding-top: 15px; }
+        .info-line { font-size: 16px; color: #666; margin-bottom: 8px; }
+        .info-line span { color: #333; }
+        .action-button { width: 100%; padding: 12px 0; border-radius: 8px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-signin { background-color: #ea6b42; color: white; }
+        .btn-signedin { background-color: #f7a88e; color: white; }
+        #page2 .content { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 80vh; text-align: center; }
+        .loading-dots { position: relative; width: 80px; height: 80px; margin-bottom: 40px; }
+        .dot { position: absolute; width: 16px; height: 16px; border-radius: 50%; }
+        .dot1 { background-color: #add181; top: 0; left: 50%; transform: translateX(-50%); }
+        .dot2 { background-color: #f9e262; top: 50%; right: 0; transform: translateY(-50%); }
+        .dot3 { background-color: #add181; bottom: 0; left: 50%; transform: translateX(-50%); }
+        .loading-number { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #333; font-weight: 500; }
+        .success-message { font-size: 22px; color: #333; }
+    </style>
+</head>
+<body>
+
+    <div id="page1" class="page active">
+        <header class="header">
+            <a href="#" class="back-arrow">&lt;</a>
+            <div class="header-title-container">
+                 <span class="title">我的今日预约</span>
+            </div>
+            </header>
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">健身房</span>
+                    <span class="card-id" id="page1CardId">#2693464</span>
+                </div>
+                <div class="card-body">
+                    <p class="info-line">预约时间: <span id="appointmentTime"></span></p>
+                </div>
+                <button id="signInButton" class="action-button btn-signin">签到</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page2" class="page">
+        <header class="header">
+            <a href="#" class="back-arrow">✕</a>
+            <div class="header-title-container">
+                 </div>
+            <a href="#" class="more-options">...</a>
+        </header>
+        <div class="content">
+            <div class="loading-dots">
+                <div class="dot dot1"></div>
+                <div class="dot dot2"></div>
+                <div class="dot dot3"></div>
+                <div class="loading-number">1</div>
+            </div>
+            <p class="success-message">该时段签到成功</p>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <header class="header">
+            <a href="#" class="back-arrow">&lt;</a>
+            <div class="header-title-container">
+                 <span class="title">我的今日预约</span>
+            </div>
+            </header>
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">健身房</span>
+                    <span class="card-id" id="page3CardId">#2693464</span>
+                </div>
+                <div class="card-body">
+                    <p class="info-line">预约时间: <span id="finalAppointmentTime"></span></p>
+                    <p class="info-line">签到时间: <span id="checkInTime"></span></p>
+                </div>
+                <button class="action-button btn-signedin" disabled>已签到</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const signInButton = document.getElementById('signInButton');
+        const appointmentTimeElement = document.getElementById('appointmentTime');
+        const finalAppointmentTimeElement = document.getElementById('finalAppointmentTime');
+        const checkInTimeElement = document.getElementById('checkInTime');
+        const page1CardIdElement = document.getElementById('page1CardId');
+        const page3CardIdElement = document.getElementById('page3CardId');
+
+        // Function to format the date and time
+        function formatDateTime(date, type) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const nextHour = (date.getHours() + 1).toString().padStart(2, '0');
+
+            if (type === 'appointment') {
+                return `${year}-${month}-${day} ${hours}:00-${nextHour}:00`;
+            } else if (type === 'check-in') {
+                return `${month}-${day} ${hours}:${minutes}`;
+            }
+        }
+        
+        // Function to generate a random 7-digit ID with the first digit between 2 and 5
+        function generateRandomId() {
+            const firstDigit = Math.floor(Math.random() * 4) + 2; // Random number from 2 to 5
+            const restOfDigits = Math.floor(100000 + Math.random() * 900000); // 6-digit number
+            return `#${firstDigit}${restOfDigits}`;
+        }
+
+        // Set the initial appointment time and ID on page load
+        const now = new Date();
+        appointmentTimeElement.textContent = formatDateTime(now, 'appointment');
+        page1CardIdElement.textContent = generateRandomId();
+
+        signInButton.addEventListener('click', () => {
+            page1.classList.remove('active');
+            page2.classList.add('active');
+            document.title = "";
+
+            // Capture the exact check-in time right before the transition
+            const checkInDate = new Date();
+
+            setTimeout(() => {
+                page2.classList.remove('active');
+                page3.classList.add('active');
+                document.title = "我的今日预约";
+
+                // Update the times and ID on the final page
+                finalAppointmentTimeElement.textContent = formatDateTime(now, 'appointment');
+                checkInTimeElement.textContent = formatDateTime(checkInDate, 'check-in');
+                page3CardIdElement.textContent = page1CardIdElement.textContent; // Use the same ID
+            }, 2000);
+        });
+    </script>
+
+</body>
+</html>
