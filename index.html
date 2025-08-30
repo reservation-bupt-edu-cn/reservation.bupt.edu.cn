@@ -1,163 +1,330 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>我的今日预约</title>
-    <style>
-        /* CSS样式部分保持不变，和之前的代码一样 */
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f8f8f8; color: #333; }
-        .page { display: none; height: 100%; box-sizing: border-box; }
-        .page.active { display: block; }
-        .header { display: flex; align-items: center; padding: 10px 15px; background-color: #ffffff; border-bottom: 1px solid #e5e5e5; position: relative; text-align: center; }
-        .header-title-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 24px; }
-        .header .title { font-size: 17px; font-weight: 600; color: #000; }
-        .header .back-arrow, .header .more-options { font-size: 24px; font-weight: bold; color: #000; text-decoration: none; position: absolute; }
-        .header .back-arrow { left: 15px; }
-        .header .more-options { right: 15px; }
-        .content { padding: 20px; }
-        .card { background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
-        .card-title { font-size: 18px; font-weight: bold; }
-        .card-id { font-size: 14px; color: #999; }
-        .card-body { padding-top: 15px; }
-        .info-line { font-size: 16px; color: #666; margin-bottom: 8px; }
-        .info-line span { color: #333; }
-        .action-button { width: 100%; padding: 12px 0; border-radius: 8px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-signin { background-color: #ea6b42; color: white; }
-        .btn-signedin { background-color: #f7a88e; color: white; }
-        #page2 .content { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 80vh; text-align: center; }
-        .loading-dots { position: relative; width: 80px; height: 80px; margin-bottom: 40px; }
-        .dot { position: absolute; width: 16px; height: 16px; border-radius: 50%; }
-        .dot1 { background-color: #add181; top: 0; left: 50%; transform: translateX(-50%); }
-        .dot2 { background-color: #f9e262; top: 50%; right: 0; transform: translateY(-50%); }
-        .dot3 { background-color: #add181; bottom: 0; left: 50%; transform: translateX(-50%); }
-        .loading-number { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #333; font-weight: 500; }
-        .success-message { font-size: 22px; color: #333; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>北邮体育馆</title>
+  <link rel="stylesheet" href="//storage.joyreserve.com/Public/Wechat/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//storage.joyreserve.com/Public/Wechat/css/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//storage.joyreserve.com/Public/Wechat/css/main.css?date=20190810?date=20190809">
+  <link rel="stylesheet" href="//storage.joyreserve.com/Public/Wechat/css/my_register.css">
+  <style>
+    /* 通用隐藏 */
+    .hidden { display: none; }
+
+    /* 页2/页3的加载动画样式（与原样式一致） */
+    .number{
+      text-align: center;
+      font-size: 0.6rem;
+      color:#666666;
+      position: relative;
+      top:2.77rem;
+    }
+    .loading{
+      width: 2.3rem;
+      height: 2.3rem;
+      margin: 0 auto;
+      margin-bottom: 0.76rem;
+      margin-top:1.2rem;
+      position: relative;
+      -webkit-animation: load 3s linear infinite;
+    }
+    .loading div{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+    .loading span{
+      display: inline-block;
+      width: 0.43rem;
+      height: 0.43rem;
+      border-radius: 50%;
+      background: #99CC66;
+      position: absolute;
+      left: 50%;
+      margin-top: -0.1rem;
+      margin-left: -0.1rem;
+      -webkit-animation: changeBgColor 3s ease infinite;
+    }
+    @-webkit-keyframes load{
+      0%{ -webkit-transform: rotate(0deg); }
+      33.3%{ -webkit-transform: rotate(120deg); }
+      66.6%{ -webkit-transform: rotate(240deg); }
+      100%{ -webkit-transform: rotate(360deg); }
+    }
+    @-webkit-keyframes changeBgColor{
+      0%,100%{ background: #99CC66; }
+      33.3%{ background: #FFFF66; }
+      66.6%{ background: #FF6666; }
+    }
+    .loading div:nth-child(2){ -webkit-transform: rotate(120deg); }
+    .loading div:nth-child(3){ -webkit-transform: rotate(240deg); }
+    .loading div:nth-child(2) span{ -webkit-animation-delay: 1s; }
+    .loading div:nth-child(3) span{ -webkit-animation-delay: 2s; }
+
+    .loading-text{
+      font-size: 0.56rem;
+      color:#666666;
+      text-align: center;
+      letter-spacing: 0.03rem;
+      padding-right: 80px;
+      padding-left: 80px;
+    }
+
+    /* 为了不影响页1/页4的排版，我们不全局设置 html 的 rem 基准。
+       在进入页2/页3时，通过 JS 动态设置 html 的 font-size 实现与原页一致的比例。 */
+  </style>
 </head>
 <body>
 
-    <div id="page1" class="page active">
-        <header class="header">
-            <a href="#" class="back-arrow">&lt;</a>
-            <div class="header-title-container">
-                 <span class="title">我的今日预约</span>
-            </div>
-            </header>
-        <div class="content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">健身房</span>
-                    <span class="card-id" id="page1CardId">#2693464</span>
-                </div>
-                <div class="card-body">
-                    <p class="info-line">预约时间: <span id="appointmentTime"></span></p>
-                </div>
-                <button id="signInButton" class="action-button btn-signin">签到</button>
-            </div>
+  <!-- 页面1：我的今日预约（原page1） -->
+  <div id="page1">
+    <header class="header">
+      <div class="header-title">
+        <div class="col-xs-2">
+          <a href="/index.php/Wechat/Show/index"><img src="//storage.joyreserve.com/Public/Wechat/img/left.png"></a>
         </div>
-    </div>
-
-    <div id="page2" class="page">
-        <header class="header">
-            <a href="#" class="back-arrow">✕</a>
-            <div class="header-title-container">
-                 </div>
-            <a href="#" class="more-options">...</a>
-        </header>
-        <div class="content">
-            <div class="loading-dots">
-                <div class="dot dot1"></div>
-                <div class="dot dot2"></div>
-                <div class="dot dot3"></div>
-                <div class="loading-number">1</div>
-            </div>
-            <p class="success-message">该时段签到成功</p>
+        <div class="col-xs-8">
+          <h1 class="title">我的今日预约</h1>
         </div>
-    </div>
+      </div>
+    </header>
 
-    <div id="page3" class="page">
-        <header class="header">
-            <a href="#" class="back-arrow">&lt;</a>
-            <div class="header-title-container">
-                 <span class="title">我的今日预约</span>
-            </div>
-            </header>
-        <div class="content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">健身房</span>
-                    <span class="card-id" id="page3CardId">#2693464</span>
-                </div>
-                <div class="card-body">
-                    <p class="info-line">预约时间: <span id="finalAppointmentTime"></span></p>
-                    <p class="info-line">签到时间: <span id="checkInTime"></span></p>
-                </div>
-                <button class="action-button btn-signedin" disabled>已签到</button>
-            </div>
+    <section class="my_register">
+      <div class="list">
+        <div class="list-one" style="background: white;border-radius: 7px;padding: 20px;margin-bottom:8px;max-height: 50%;">
+          <div class="reserve-place" style="float:left;min-width: 180px;font-size: 23px;">健身房</div>
+          <h5 class="reserve-id" style="float:right;font-size: 13.5px;margin-top: 13px;color:#999999;">#2715428</h5>
+
+          <div id="p1ReserveTime" class="discription" style="margin-top: 44px;border-top: 1px solid #E5E5E5;padding-top: 15px; font-size: 15px;color: #333333;">
+            预约时间：加载中...
+          </div>
+
+          <div class="button-section" style="min-height:80px;">
+            <button type="button" id="btnAttend" class="btn btn-success btn-warning" style="margin-top:25px;color: white;border-radius: 5px;background-color: #E9532E;font-size: 17px;text-align: center;padding:11px 0;width: 100%">
+              签到
+            </button>
+          </div>
         </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 页面2：提示（最多提前开始时间 15 分钟签到该时段）（原page2） -->
+  <div id="page2" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p2Href" href="javascript:void(0);">
+        <div class="number" id="p2Wait">3</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">最多提前开始时间 15 分钟签到该时段</div>
     </div>
+  </div>
 
-    <script>
-        const page1 = document.getElementById('page1');
-        const page2 = document.getElementById('page2');
-        const page3 = document.getElementById('page3');
-        const signInButton = document.getElementById('signInButton');
-        const appointmentTimeElement = document.getElementById('appointmentTime');
-        const finalAppointmentTimeElement = document.getElementById('finalAppointmentTime');
-        const checkInTimeElement = document.getElementById('checkInTime');
-        const page1CardIdElement = document.getElementById('page1CardId');
-        const page3CardIdElement = document.getElementById('page3CardId');
+  <!-- 页面2B：提示（最晚在开始时间后35 分钟签到该时段） -->
+  <div id="page2b" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p2bHref" href="javascript:void(0);">
+        <div class="number" id="p2bWait">3</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">最晚在开始时间后35 分钟签到该时段</div>
+    </div>
+  </div>
 
-        // Function to format the date and time
-        function formatDateTime(date, type) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const nextHour = (date.getHours() + 1).toString().padStart(2, '0');
+  <!-- 页面3：签到成功（原page3，改为本地跳转2秒后到页面4） -->
+  <div id="page3" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p3Href" href="javascript:void(0);">
+        <div class="number" id="p3Wait">2</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">该时段签到成功</div>
+    </div>
+  </div>
 
-            if (type === 'appointment') {
-                return `${year}-${month}-${day} ${hours}:00-${nextHour}:00`;
-            } else if (type === 'check-in') {
-                return `${month}-${day} ${hours}:${minutes}`;
-            }
+  <!-- 页面4：已签到（原page4） -->
+  <div id="page4" class="hidden">
+    <header class="header">
+      <div class="header-title">
+        <div class="col-xs-2">
+          <a href="/index.php/Wechat/Show/index"><img src="//storage.joyreserve.com/Public/Wechat/img/left.png"></a>
+        </div>
+        <div class="col-xs-8">
+          <h1 class="title">我的今日预约</h1>
+        </div>
+      </div>
+    </header>
+
+    <section class="my_register">
+      <div class="list">
+        <div class="list-one" style="background: white;border-radius: 7px;padding: 20px;margin-bottom:8px;max-height: 50%;">
+          <div class="reserve-place" style="float:left;min-width: 180px;font-size: 23px;color: #999999;">健身房</div>
+          <h5 class="reserve-id" style="float:right;font-size: 13.5px;margin-top: 13px;color:#999999;">#2715428</h5>
+
+          <div id="p4ReserveTime" class="discription" style="margin-top: 44px;border-top: 1px solid #E5E5E5;padding-top: 15px; font-size: 15px;color: #999999;">
+            预约时间：加载中...
+          </div>
+
+          <div class="button-section" style="min-height:80px;">
+            <div id="p4CheckinTime" class="discription" style="padding-top: 5px; font-size: 15px;color: #999999;">
+              签到时间：加载中...
+            </div>
+            <label style="margin-top:15px;color: white;border-radius: 5px;background-color: #FFA287;font-size: 17px;text-align: center;padding:11px 0;width: 100%;display: inline-block;">已签到</label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // 工具函数
+    function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+
+    function cloneDate(d){ return new Date(d.getTime()); }
+
+    // 根据当前时间计算预约时段和点击逻辑分支
+    // bucket: 'CURRENT'（00-35）、'GRACE'（35-45 之间）、'NEXT'（45-59）
+    function computeSlot(now){
+      const y = now.getFullYear();
+      const m = now.getMonth(); // 0-based
+      const d = now.getDate();
+      const min = now.getMinutes();
+      const h = now.getHours();
+
+      let bucket = 'CURRENT';
+      if(min <= 35){
+        bucket = 'CURRENT';
+      }else if(min < 45){
+        bucket = 'GRACE';
+      }else{
+        bucket = 'NEXT';
+      }
+
+      let slotStart = new Date(y, m, d, h, 0, 0, 0);
+      if(bucket === 'NEXT'){
+        slotStart = new Date(y, m, d, h + 1, 0, 0, 0);
+      }
+      const slotEnd = new Date(slotStart.getFullYear(), slotStart.getMonth(), slotStart.getDate(), slotStart.getHours() + 1, 0, 0, 0);
+
+      const dateStr = slotStart.getFullYear() + '-' + pad2(slotStart.getMonth()+1) + '-' + pad2(slotStart.getDate());
+      const slotStr = dateStr + ' ' + pad2(slotStart.getHours()) + ':00-' + pad2(slotEnd.getHours()) + ':00';
+
+      return { bucket, slotStart, slotEnd, slotStr, dateStr };
+    }
+
+    // 切换页面显示
+    function showPage(id){
+      // 页面容器集合
+      const pages = ['page1', 'page2', 'page2b', 'page3', 'page4'];
+      pages.forEach(pid => {
+        document.getElementById(pid).classList.toggle('hidden', pid !== id);
+      });
+
+      // 仅在页2/页3显示时，为了与原页一致，设置 html 的 font-size 作为 rem 基准
+      if(id === 'page2' || id === 'page2b' || id === 'page3'){
+        document.documentElement.style.fontSize = 'calc(100vh/13.7)';
+      }else{
+        document.documentElement.style.fontSize = '';
+      }
+    }
+
+    // 通用倒计时
+    function runCountdown(elId, seconds, onEnd){
+      const el = document.getElementById(elId);
+      let left = seconds;
+      el.textContent = left;
+      const timer = setInterval(() => {
+        left -= 1;
+        el.textContent = left;
+        if(left <= 0){
+          clearInterval(timer);
+          onEnd && onEnd();
         }
-        
-        // Function to generate a random 7-digit ID with the first digit between 2 and 5
-        function generateRandomId() {
-            const firstDigit = Math.floor(Math.random() * 4) + 2; // Random number from 2 to 5
-            const restOfDigits = Math.floor(100000 + Math.random() * 900000); // 6-digit number
-            return `#${firstDigit}${restOfDigits}`;
-        }
+      }, 1000);
+    }
 
-        // Set the initial appointment time and ID on page load
-        const now = new Date();
-        appointmentTimeElement.textContent = formatDateTime(now, 'appointment');
-        page1CardIdElement.textContent = generateRandomId();
+    // 状态
+    let currentSlotInfo = null;
+    let lastCheckinTimeStr = '';
 
-        signInButton.addEventListener('click', () => {
-            page1.classList.remove('active');
-            page2.classList.add('active');
-            document.title = "";
+    // 初始化或刷新页面1的数据
+    function refreshPage1(){
+      const now = new Date();
+      currentSlotInfo = computeSlot(now);
+      const p1ReserveTime = document.getElementById('p1ReserveTime');
+      p1ReserveTime.textContent = '预约时间：' + currentSlotInfo.slotStr;
+    }
 
-            // Capture the exact check-in time right before the transition
-            const checkInDate = new Date();
+    // 进入页面4时填充数据
+    function fillPage4(){
+      const p4ReserveTime = document.getElementById('p4ReserveTime');
+      p4ReserveTime.textContent = '预约时间：' + (currentSlotInfo ? currentSlotInfo.slotStr : '');
 
-            setTimeout(() => {
-                page2.classList.remove('active');
-                page3.classList.add('active');
-                document.title = "我的今日预约";
+      const now = new Date();
+      lastCheckinTimeStr = pad2(now.getMonth()+1) + '-' + pad2(now.getDate()) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+      document.getElementById('p4CheckinTime').textContent = '签到时间：' + lastCheckinTimeStr;
+    }
 
-                // Update the times and ID on the final page
-                finalAppointmentTimeElement.textContent = formatDateTime(now, 'appointment');
-                checkInTimeElement.textContent = formatDateTime(checkInDate, 'check-in');
-                page3CardIdElement.textContent = page1CardIdElement.textContent; // Use the same ID
-            }, 2000);
+    // 签到按钮逻辑
+    function handleAttendClick(){
+      // 计算当前时间的分支
+      const now = new Date();
+      currentSlotInfo = computeSlot(now);
+
+      if(currentSlotInfo.bucket === 'CURRENT'){
+        // 跳转页面3 -> 2秒后到页面4
+        showPage('page3');
+        runCountdown('p3Wait', 2, () => {
+          fillPage4();
+          showPage('page4');
         });
-    </script>
+      }else if(currentSlotInfo.bucket === 'GRACE'){
+        // 跳转到“最晚在开始时间后35 分钟签到该时段”提示页，3秒后返回页面1
+        showPage('page2b');
+        runCountdown('p2bWait', 3, () => {
+          refreshPage1();
+          showPage('page1');
+        });
+      }else{
+        // NEXT：跳转到“最多提前开始时间 15 分钟签到该时段”提示页，3秒后返回页面1
+        showPage('page2');
+        runCountdown('p2Wait', 3, () => {
+          refreshPage1();
+          showPage('page1');
+        });
+      }
+    }
 
+    // 绑定事件与初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshPage1();
+      showPage('page1');
+
+      document.getElementById('btnAttend').addEventListener('click', handleAttendClick);
+
+      // 页2/页2b的“返回”链接（点击立即返回页1）
+      document.getElementById('p2Href').addEventListener('click', () => { refreshPage1(); showPage('page1'); });
+      document.getElementById('p2bHref').addEventListener('click', () => { refreshPage1(); showPage('page1'); });
+
+      // 页3的“链接”（点击立即到页4）
+      document.getElementById('p3Href').addEventListener('click', () => { fillPage4(); showPage('page4'); });
+    });
+  </script>
 </body>
 </html>
