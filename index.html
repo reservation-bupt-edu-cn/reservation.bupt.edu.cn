@@ -180,11 +180,10 @@
     // 工具函数
     function pad2(n){ return n < 10 ? '0' + n : '' + n; }
 
-    // 根据当前时间计算预约时段和点击逻辑分支
-    // 规则调整：
-    // - 00-35 => 当前时段，允许签到（成功）
-    // - 35-45 => 下一时段，但点击只能看到“最多提前15分钟”提示，不能签到
-    // - 45-59 => 下一时段，允许签到（成功）
+    // 根据当前时间计算预约时段和点击逻辑分支（按最新需求）
+    // - 分钟 < 35           => 当前时段，允许签到
+    // - 35 <= 分钟 < 45     => 下一时段，但暂不可签（提示“最多提前15分钟...”）
+    // - 45 <= 分钟 <= 59 或 分钟 == 0（整点）=> 下一时段，允许签到
     function computeSlot(now){
       const y = now.getFullYear();
       const m = now.getMonth(); // 0-based
@@ -193,12 +192,13 @@
       const h = now.getHours();
 
       let bucket = 'CURRENT'; // CURRENT, NEXT_EARLY, NEXT_OK
-      if(min < 35){
-        bucket = 'CURRENT';
-      }else if(min < 45){
-        bucket = 'NEXT_EARLY';
-      }else{
+
+      if (min === 0 || min >= 45) {
         bucket = 'NEXT_OK';
+      } else if (min >= 35 && min < 45) {
+        bucket = 'NEXT_EARLY';
+      } else {
+        bucket = 'CURRENT';
       }
 
       let slotStart = new Date(y, m, d, h, 0, 0, 0);
@@ -265,9 +265,8 @@
       document.getElementById('p4CheckinTime').textContent = '签到时间：' + lastCheckinTimeStr;
     }
 
-    // 签到按钮逻辑（根据新需求）
+    // 签到按钮逻辑（根据最新需求）
     function handleAttendClick(){
-      // 计算当前时间的分支
       const now = new Date();
       currentSlotInfo = computeSlot(now);
 
