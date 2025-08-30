@@ -126,6 +126,22 @@
     </div>
   </div>
 
+  <!-- 页面2B：提示（最晚在开始时间后35 分钟签到该时段） -->
+  <div id="page2b" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p2bHref" href="javascript:void(0);">
+        <div class="number" id="p2bWait">3</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">最晚在开始时间后35 分钟签到该时段</div>
+    </div>
+  </div>
+
   <!-- 页面3：签到成功（原page3，改为本地跳转2秒后到页面4） -->
   <div id="page3" class="hidden">
     <div class="blank"></div>
@@ -180,10 +196,10 @@
     // 工具函数
     function pad2(n){ return n < 10 ? '0' + n : '' + n; }
 
+    function cloneDate(d){ return new Date(d.getTime()); }
+
     // 根据当前时间计算预约时段和点击逻辑分支
-    // 新规则：
-    // - 分钟 < 35：预约为当前整点时段，点击 -> 页面3（2秒后到页面4）
-    // - 分钟 >= 35：预约为下一整点时段，点击 -> 页面2（提示“最多提前开始时间 15 分钟签到该时段”，3秒后返回页面1）
+    // bucket: 'CURRENT'（00-35）、'GRACE'（35-45 之间）、'NEXT'（45-59）
     function computeSlot(now){
       const y = now.getFullYear();
       const m = now.getMonth(); // 0-based
@@ -191,9 +207,17 @@
       const min = now.getMinutes();
       const h = now.getHours();
 
-      const useNext = (min >= 35); // 35 分开始使用下一时段
+      let bucket = 'CURRENT';
+      if(min <= 35){
+        bucket = 'CURRENT';
+      }else if(min < 45){
+        bucket = 'NEXT';
+      }else{
+        bucket = 'CURRENT';
+      }
+
       let slotStart = new Date(y, m, d, h, 0, 0, 0);
-      if(useNext){
+      if(bucket === 'NEXT'){
         slotStart = new Date(y, m, d, h + 1, 0, 0, 0);
       }
       const slotEnd = new Date(slotStart.getFullYear(), slotStart.getMonth(), slotStart.getDate(), slotStart.getHours() + 1, 0, 0, 0);
@@ -201,18 +225,19 @@
       const dateStr = slotStart.getFullYear() + '-' + pad2(slotStart.getMonth()+1) + '-' + pad2(slotStart.getDate());
       const slotStr = dateStr + ' ' + pad2(slotStart.getHours()) + ':00-' + pad2(slotEnd.getHours()) + ':00';
 
-      return { useNext, slotStart, slotEnd, slotStr, dateStr };
+      return { bucket, slotStart, slotEnd, slotStr, dateStr };
     }
 
     // 切换页面显示
     function showPage(id){
-      const pages = ['page1', 'page2', 'page3', 'page4'];
+      // 页面容器集合
+      const pages = ['page1', 'page2', 'page2b', 'page3', 'page4'];
       pages.forEach(pid => {
         document.getElementById(pid).classList.toggle('hidden', pid !== id);
       });
 
       // 仅在页2/页3显示时，为了与原页一致，设置 html 的 font-size 作为 rem 基准
-      if(id === 'page2' || id === 'page3'){
+      if(id === 'page2' || id === 'page2b' || id === 'page3'){
         document.documentElement.style.fontSize = 'calc(100vh/13.7)';
       }else{
         document.documentElement.style.fontSize = '';
@@ -256,24 +281,32 @@
       document.getElementById('p4CheckinTime').textContent = '签到时间：' + lastCheckinTimeStr;
     }
 
-    // 签到按钮逻辑（按新规则）
+    // 签到按钮逻辑
     function handleAttendClick(){
+      // 计算当前时间的分支
       const now = new Date();
       currentSlotInfo = computeSlot(now);
 
-      if(currentSlotInfo.useNext){
-        // 35 分及之后：下一时段，提示页2，3秒后返回页1
-        showPage('page2');
-        runCountdown('p2Wait', 3, () => {
-          refreshPage1();
-          showPage('page1');
-        });
-      }else{
-        // 小于 35 分：当前时段，成功页3 -> 2 秒后到页4
+      if(currentSlotInfo.bucket === 'CURRENT'){
+        // 跳转页面3 -> 2秒后到页面4
         showPage('page3');
         runCountdown('p3Wait', 2, () => {
           fillPage4();
           showPage('page4');
+        });
+      }else if(currentSlotInfo.bucket === 'GRACE'){
+        // 跳转到“最晚在开始时间后35 分钟签到该时段”提示页，3秒后返回页面1
+        showPage('page2b');
+        runCountdown('p2bWait', 3, () => {
+          refreshPage1();
+          showPage('page1');
+        });
+      }else{
+        // NEXT：跳转到“最多提前开始时间 15 分钟签到该时段”提示页，3秒后返回页面1
+        showPage('page2');
+        runCountdown('p2Wait', 3, () => {
+          refreshPage1();
+          showPage('page1');
         });
       }
     }
@@ -285,8 +318,9 @@
 
       document.getElementById('btnAttend').addEventListener('click', handleAttendClick);
 
-      // 页2的“返回”链接（点击立即返回页1）
+      // 页2/页2b的“返回”链接（点击立即返回页1）
       document.getElementById('p2Href').addEventListener('click', () => { refreshPage1(); showPage('page1'); });
+      document.getElementById('p2bHref').addEventListener('click', () => { refreshPage1(); showPage('page1'); });
 
       // 页3的“链接”（点击立即到页4）
       document.getElementById('p3Href').addEventListener('click', () => { fillPage4(); showPage('page4'); });
