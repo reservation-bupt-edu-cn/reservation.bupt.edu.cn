@@ -1,0 +1,350 @@
+* {
+	margin:0;
+	padding:0;
+}
+.carousel-inner img {
+  width: 100%;
+  height: auto;
+}
+::-webkit-scrollbar{
+  width: 0;
+}
+body,div,ul,li,p{margin:0;padding:0;}
+ul{list-style-type:none;}
+html {
+	font-size:20px
+}
+h1,h2,h3,h4,h5{
+	font-family: 'microsoft yahei'
+}
+body {
+	font-family:'microsoft yahei';
+	font-size:14px;
+	color:#444;
+  background:#f5f5f5;
+}
+input[type="text"], input[type="number"], input[type="password"],input[type="email"],input[type="phone"],textarea{
+  -webkit-appearance: none;
+}
+a {
+	text-decoration:none;
+	color:#444
+}
+a:hover,a:link,a:visited,a:hover{
+	text-decoration: none;
+	border: none;
+	outline: none;
+	color: #333;
+}
+img {
+	border:none;
+	vertical-align:top
+}
+/*header*/
+ .user_information{
+    font-size: 20px;
+    font-weight: bolder;
+    text-align: center;
+    background-color: black;
+    color: #fff;
+        padding: 10px 0px;
+  }
+.header {
+	position:fixed;
+	z-index:99999;
+	top:0;
+  height: 40px;
+	width:100%;
+	line-height:40px;
+	box-sizing:border-box;
+  text-align: center;
+}
+.header .header-title{
+  height: 40px;
+  background-color: #fff;
+}
+.header .header-title h1 {
+  margin: 0;
+  display: inline;
+  font-size: 18px;
+  color: #333;
+  line-height: 40px;
+  font-weight: bold;
+}
+.header-title img{
+  width: 18px;
+  height: 18px;
+  margin-top: 11px;
+}
+b,em,h1,h2,h3,h4,h5,i,li,ol,ul {
+	font-style:normal;
+	font-weight:400;
+	list-style:none
+}
+/*nav*/
+nav.nav {
+	position:fixed;
+  bottom:0;
+  /* left:0; */
+	width:100%; 
+	height:47px;
+  border-top: 1px solid #eee;
+  background: #fff;
+  z-index: 99999;
+}
+nav.nav ul {
+	width:100%;
+  overflow:hidden;
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+}
+nav.nav li {
+  text-align:center;
+  width: 33%;
+}
+nav.nav li a {
+	font-size:10px;
+	color:#978c91;
+	line-height:1.6em;
+	display:block
+}
+nav.nav li.active a,nav.nav li.active i {
+	color:rgba(200,0,0,.8);
+}
+nav.nav li .icon,nav.nav li .fa{
+	display:block;
+	height:24px;
+	margin-top:3px;
+	font-size:23px;
+	line-height:24px;
+	color:#978c91
+}
+nav.nav li .iconfont,nav.nav li .fa{
+    display:block;
+    height:24px;
+    margin-top:3px;
+    font-size:23px;
+    line-height:24px;
+    color:#978c91
+}
+nav.nav li .icon-home {
+	font-size:20px
+}
+nav.nav li .icon-shop {
+	font-size:20px
+}
+nav.nav li .icon-me {
+	font-size:20px
+}
+nav.nav li .icon-pic{
+  font-size: 20px;
+}
+.header .back{
+  height: 50px;
+}
+.header .back .title{
+  line-height: 50px;
+}
+.header .back .backlink{
+  height: 50px;
+  line-height: 50px;
+}
+
+/*缓冲提示条 start*/
+.buffer{
+    background-color: black;
+    height: 120px;
+    width: 60%;
+    margin: auto;
+    margin-top: 30%;
+    filter: alpha(Opacity=60);
+    -moz-opacity: 0.6;
+    opacity: 0.85;
+    border-radius: 7px;
+}
+
+.buffer_tip{
+  color: wheat;
+  font-size: 20px;
+  display: block;
+  padding-top: 15px;
+}
+
+.spinner {
+  margin: -200% auto;
+  height: 60px;
+  text-align: center;
+  font-size: 10px;
+}
+ 
+.spinner > div {
+  background-color: #67CF22;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+   
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+ 
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+ 
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+ 
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+ 
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+ 
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) } 
+  20% { -webkit-transform: scaleY(1.0) }
+}
+ 
+@keyframes stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+
+
+.spinner2 {
+  width: 150px;
+  text-align: center;
+}
+ 
+.spinner2 > div {
+  width: 30px;
+  height: 30px;
+  background-color: #67CF22;
+ 
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: bouncedelay 1.4s infinite ease-in-out;
+  animation: bouncedelay 1.4s infinite ease-in-out;
+  /* Prevent first frame from flickering when animation starts */
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.spinner2 .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+ 
+.spinner2 .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+ 
+@-webkit-keyframes bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0.0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+ 
+@keyframes bouncedelay {
+  0%, 80%, 100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 40% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+
+/*缓冲提示条 end*/
+
+.reservation_table_tip{
+    height: 41px;
+    background-color: white;
+    margin-bottom: 8px;
+    margin-top: -10px;
+}
+
+.reservation_table_tip h5{
+    font-size: 17px;
+    margin-top: 11px;
+}
+
+.reservation_table_tip i{
+    font-size: 23px;
+    color: #CF2525;
+    margin-left: 16px;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+#right_direaction{
+    margin-top: 13px;
+    float: right;
+    margin-right: 33px;
+    color: #CF2525;
+}
+.panel{
+  margin-bottom: 10px;
+}
+.panel-heading{
+  padding: 10px;
+}
+.panel-body{
+  padding: 10px;
+}
+.panel-body h4{
+  margin: 0;
+  font-weight: bold;
+}
+.panel-body hr{
+  margin: 10px 0;
+}
+.thumbnail{
+  margin-bottom: 0;
+}
+.btn-danger{
+  background-color: #fff;
+  color: #d43f3a;
+}
+.btn-success{
+  background-color: #fff;
+  color: #5cb85c;
+}
+.modal-heading{
+  padding: 10px;
+}
+.modal-content{
+  border-radius: 0;
+}
+
+
+.green_btn {
+  display: initial !important; 
+  border-color: #4cae4c !important; 
+  color: #1c9e1c !important; 
+}
+
+/** 加减符号 */
+.add strong {
+    background: url(/reserve/1/Public/Wechat/shopping/img/up.png) no-repeat;
+    background-size: 22px 22px;
+}
+
+.minus strong {
+    background: url(/reserve/1/Public/Wechat/shopping/img/down.png) no-repeat;
+    background-size: 22px 22px;
+}
+
