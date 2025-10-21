@@ -1,0 +1,362 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>北邮体育馆</title>
+  <link rel="stylesheet" href="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/bootstrap.min.css">
+  <link rel="stylesheet" href="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/font-awesome.min.css">
+  <link rel="stylesheet" href="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/main.css">
+  <link rel="stylesheet" href="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/my_register.css">
+  <style>
+    /* 通用隐藏 */
+    .hidden { display: none; }
+
+    /* 页2/页3的加载动画样式（与原样式一致） */
+    .number{
+      text-align: center;
+      font-size: 0.6rem;
+      color:#666666;
+      position: relative;
+      top:2.77rem;
+    }
+    .loading{
+      width: 2.3rem;
+      height: 2.3rem;
+      margin: 0 auto;
+      margin-bottom: 0.76rem;
+      margin-top:1.2rem;
+      position: relative;
+      -webkit-animation: load 3s linear infinite;
+    }
+    .loading div{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+    .loading span{
+      display: inline-block;
+      width: 0.43rem;
+      height: 0.43rem;
+      border-radius: 50%;
+      background: #99CC66;
+      position: absolute;
+      left: 50%;
+      margin-top: -0.1rem;
+      margin-left: -0.1rem;
+      -webkit-animation: changeBgColor 3s ease infinite;
+    }
+    @-webkit-keyframes load{
+      0%{ -webkit-transform: rotate(0deg); }
+      33.3%{ -webkit-transform: rotate(120deg); }
+      66.6%{ -webkit-transform: rotate(240deg); }
+      100%{ -webkit-transform: rotate(360deg); }
+    }
+    @-webkit-keyframes changeBgColor{
+      0%,100%{ background: #99CC66; }
+      33.3%{ background: #FFFF66; }
+      66.6%{ background: #FF6666; }
+    }
+    .loading div:nth-child(2){ -webkit-transform: rotate(120deg); }
+    .loading div:nth-child(3){ -webkit-transform: rotate(240deg); }
+    .loading div:nth-child(2) span{ -webkit-animation-delay: 1s; }
+    .loading div:nth-child(3) span{ -webkit-animation-delay: 2s; }
+
+    .loading-text{
+      font-size: 0.56rem;
+      color:#666666;
+      text-align: center;
+      letter-spacing: 0.03rem;
+      padding-right: 80px;
+      padding-left: 80px;
+    }
+
+    /* 为了不影响页1/页4的排版，我们不全局设置 html 的 rem 基准。
+       在进入页2/页3时，通过 JS 动态设置 html 的 font-size 实现与原页一致的比例。 */
+  </style>
+</head>
+<body>
+
+  <!-- 页面1：我的今日预约（原page1） -->
+  <div id="page1">
+    <header class="header">
+      <div class="header-title">
+        <div class="col-xs-2">
+          <a href="/index.php/Wechat/Show/index"><img src="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/left.png"></a>
+        </div>
+        <div class="col-xs-8">
+          <h1 class="title">我的今日预约</h1>
+        </div>
+      </div>
+    </header>
+
+    <section class="my_register">
+      <div class="list">
+        <div class="list-one" style="background: white;border-radius: 7px;padding: 20px;margin-bottom:8px;max-height: 50%;">
+          <div class="reserve-place" style="float:left;min-width: 180px;font-size: 23px;">健身房</div>
+          <h5 class="reserve-id" style="float:right;font-size: 13.5px;margin-top: 13px;color:#999999;">#2715428</h5>
+
+          <div id="p1ReserveTime" class="discription" style="margin-top: 44px;border-top: 1px solid #E5E5E5;padding-top: 15px; font-size: 15px;color: #333333;">
+            预约时间：加载中...
+          </div>
+
+          <div class="button-section" style="min-height:80px;">
+            <button type="button" id="btnAttend" class="btn btn-success btn-warning" style="margin-top:25px;color: white;border-radius: 5px;background-color: #E9532E;font-size: 17px;text-align: center;padding:11px 0;width: 100%">
+              签到
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 页面2：提示（最多提前开始时间 15 分钟签到该时段）（原page2） -->
+  <div id="page2" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p2Href" href="javascript:void(0);">
+        <div class="number" id="p2Wait">3</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">最多提前开始时间 15 分钟签到该时段</div>
+    </div>
+  </div>
+
+  <!-- 页面3：签到成功（原page3，改为本地跳转2秒后到页面4） -->
+  <div id="page3" class="hidden">
+    <div class="blank"></div>
+    <div>
+      <a id="p3Href" href="javascript:void(0);">
+        <div class="number" id="p3Wait">2</div>
+      </a>
+      <div class="loading">
+        <div><span></span></div>
+        <div><span></span></div>
+        <div><span></span></div>
+      </div>
+      <div class="loading-text">该时段签到成功</div>
+    </div>
+  </div>
+
+  <!-- 页面4：已签到（原page4） -->
+  <div id="page4" class="hidden">
+    <header class="header">
+      <div class="header-title">
+        <div class="col-xs-2">
+          <a href="/index.php/Wechat/Show/index"><img src="https://reservation-bupt-edu-cn.github.io/reservation.bupt.edu.cn/left.png"></a>
+        </div>
+        <div class="col-xs-8">
+          <h1 class="title">我的今日预约</h1>
+        </div>
+      </div>
+    </header>
+
+    <section class="my_register">
+      <div class="list">
+        <div class="list-one" style="background: white;border-radius: 7px;padding: 20px;margin-bottom:8px;max-height: 50%;">
+          <div class="reserve-place" style="float:left;min-width: 180px;font-size: 23px;color: #999999;">健身房</div>
+          <h5 class="reserve-id" style="float:right;font-size: 13.5px;margin-top: 13px;color:#999999;">#2715428</h5>
+
+          <div id="p4ReserveTime" class="discription" style="margin-top: 44px;border-top: 1px solid #E5E5E5;padding-top: 15px; font-size: 15px;color: #999999;">
+            预约时间：加载中...
+          </div>
+
+          <div class="button-section" style="min-height:80px;">
+            <div id="p4CheckinTime" class="discription" style="padding-top: 5px; font-size: 15px;color: #999999;">
+              签到时间：加载中...
+            </div>
+            <label style="margin-top:15px;color: white;border-radius: 5px;background-color: #FFA287;font-size: 17px;text-align: center;padding:11px 0;width: 100%;display: inline-block;">已签到</label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // 工具函数
+    function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+    function formatSlot(start, end){
+      const dateStr = start.getFullYear() + '-' + pad2(start.getMonth()+1) + '-' + pad2(start.getDate());
+      return dateStr + ' ' + pad2(start.getHours()) + ':' + pad2(start.getMinutes()) + '-' + pad2(end.getHours()) + ':' + pad2(end.getMinutes());
+    }
+
+    // 根据当前时间计算预约时段与是否可签（加入“周一/二/四/三”的特殊规则）
+    // 规则：
+    // 周一/二/四：
+    //   08:00-09:30 -> 显示 08:00-09:30，期间总是允许签到
+    //   11:10-12:30 -> 显示 11:10-12:30，期间总是允许签到
+    //   16:20-16:35 -> 显示 16:20-17:00，且仅在 16:20-16:35 允许签到
+    // 周三：
+    //   08:00-09:30 -> 显示 08:00-09:30，期间总是允许签到
+    //   11:10-11:35 -> 显示 11:10-12:00，且仅在 11:10-11:35 允许签到
+    // 其他时间段：沿用原先“整点分桶”规则（<35 当前时段可签；35-44 不可签；>=45/==0 下一时段可签）
+    function computeSlot(now){
+      const y = now.getFullYear();
+      const m = now.getMonth(); // 0-based
+      const d = now.getDate();
+      const h = now.getHours();
+      const min = now.getMinutes();
+      const dow = now.getDay(); // 0=周日 .. 6=周六
+      const nowMin = h * 60 + min;
+      const dateStr = y + '-' + pad2(m+1) + '-' + pad2(d);
+
+      function mk(startH, startM, endH, endM, can){
+        const slotStart = new Date(y, m, d, startH, startM, 0, 0);
+        const slotEnd   = new Date(y, m, d, endH, endM, 0, 0);
+        return {
+          bucket: 'SPECIAL',
+          slotStart,
+          slotEnd,
+          slotStr: formatSlot(slotStart, slotEnd),
+          dateStr,
+          canCheckin: !!can
+        };
+      }
+
+      // 周一/周二/周四：dow = 1/2/4
+      if (dow === 1 || dow === 2 || dow === 4){
+        if (nowMin >= 8*60 && nowMin <= 9*60 + 30){
+          return mk(8, 0, 9, 30, true); // 08:00-09:30 允许
+        }
+        if (nowMin >= 11*60 + 10 && nowMin <= 12*60 + 30){
+          return mk(11, 10, 12, 30, true); // 11:10-12:30 允许
+        }
+        if (nowMin >= 16*60 + 20 && nowMin <= 16*60 + 35){
+          return mk(16, 20, 17, 0, true); // 16:20-17:00，16:20-16:35 期间允许（已满足）
+        }
+        // 其他时间落回默认规则
+      }
+
+      // 周三：dow = 3
+      if (dow === 3){
+        if (nowMin >= 8*60 && nowMin <= 9*60 + 30){
+          return mk(8, 0, 9, 30, true); // 08:00-09:30 允许
+        }
+        if (nowMin >= 11*60 + 10 && nowMin <= 11*60 + 35){
+          return mk(11, 10, 12, 0, true); // 11:10-12:00，11:10-11:35 期间允许（已满足）
+        }
+        // 其他时间落回默认规则
+      }
+
+      // ===== 默认规则（与原逻辑一致） =====
+      let bucket = 'CURRENT'; // CURRENT, NEXT_EARLY, NEXT_OK
+      if (min >= 45) {
+        bucket = 'NEXT_OK';
+      } else if (min >= 35 && min < 45) {
+        bucket = 'NEXT_EARLY';
+      } else {
+        bucket = 'CURRENT';
+      }
+
+      let slotStart = new Date(y, m, d, h, 0, 0, 0);
+      if(bucket === 'NEXT_EARLY' || bucket === 'NEXT_OK'){
+        slotStart = new Date(y, m, d, h + 1, 0, 0, 0);
+      }
+      const slotEnd = new Date(slotStart.getFullYear(), slotStart.getMonth(), slotStart.getDate(), slotStart.getHours() + 1, 0, 0, 0);
+
+      const slotStr = formatSlot(slotStart, slotEnd);
+
+      return {
+        bucket,
+        slotStart,
+        slotEnd,
+        slotStr,
+        dateStr,
+        canCheckin: (bucket === 'CURRENT' || bucket === 'NEXT_OK')
+      };
+    }
+
+    // 切换页面显示
+    function showPage(id){
+      const pages = ['page1', 'page2', 'page3', 'page4'];
+      pages.forEach(pid => {
+        document.getElementById(pid).classList.toggle('hidden', pid !== id);
+      });
+
+      // 仅在页2/页3显示时，为了与原页一致，设置 html 的 font-size 作为 rem 基准
+      if(id === 'page2' || id === 'page3'){
+        document.documentElement.style.fontSize = 'calc(100vh/13.7)';
+      }else{
+        document.documentElement.style.fontSize = '';
+      }
+    }
+
+    // 通用倒计时
+    function runCountdown(elId, seconds, onEnd){
+      const el = document.getElementById(elId);
+      let left = seconds;
+      el.textContent = left;
+      const timer = setInterval(() => {
+        left -= 1;
+        el.textContent = left;
+        if(left <= 0){
+          clearInterval(timer);
+          onEnd && onEnd();
+        }
+      }, 1000);
+    }
+
+    // 状态
+    let currentSlotInfo = null;
+    let lastCheckinTimeStr = '';
+
+    // 初始化或刷新页面1的数据
+    function refreshPage1(){
+      const now = new Date();
+      currentSlotInfo = computeSlot(now);
+      const p1ReserveTime = document.getElementById('p1ReserveTime');
+      p1ReserveTime.textContent = '预约时间：' + currentSlotInfo.slotStr;
+    }
+
+    // 进入页面4时填充数据
+    function fillPage4(){
+      const p4ReserveTime = document.getElementById('p4ReserveTime');
+      p4ReserveTime.textContent = '预约时间：' + (currentSlotInfo ? currentSlotInfo.slotStr : '');
+
+      const now = new Date();
+      lastCheckinTimeStr = pad2(now.getMonth()+1) + '-' + pad2(now.getDate()) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+      document.getElementById('p4CheckinTime').textContent = '签到时间：' + lastCheckinTimeStr;
+    }
+
+    // 签到按钮逻辑（结合特殊时段 与 默认时段）
+    function handleAttendClick(){
+      const now = new Date();
+      currentSlotInfo = computeSlot(now);
+
+      if(currentSlotInfo.canCheckin){
+        // 允许签到：先到页面3，2秒后到页面4
+        showPage('page3');
+        runCountdown('p3Wait', 2, () => {
+          fillPage4();
+          showPage('page4');
+        });
+      }else{
+        // 不允许签到：展示“最多提前开始时间 15 分钟签到该时段”，3秒后返回页面1
+        showPage('page2');
+        runCountdown('p2Wait', 3, () => {
+          refreshPage1();
+          showPage('page1');
+        });
+      }
+    }
+
+    // 绑定事件与初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshPage1();
+      showPage('page1');
+
+      document.getElementById('btnAttend').addEventListener('click', handleAttendClick);
+
+      // 页2的“返回”链接（点击立即返回页1）
+      document.getElementById('p2Href').addEventListener('click', () => { refreshPage1(); showPage('page1'); });
+
+      // 页3的“链接”（点击立即到页4）
+      document.getElementById('p3Href').addEventListener('click', () => { fillPage4(); showPage('page4'); });
+    });
+  </script>
+</body>
+</html>
